@@ -127,7 +127,7 @@ function useModalFocus(open: boolean, mounted: boolean, layer: RefObject<HTMLEle
 }
 
 /** The Mac modal (`.codyncSheet`): a centered card over a dim; the content sizes it. */
-export function Sheet({ open, onClose, width, height, maxHeight, dismissOnDim = false, children }: {
+export function Sheet({ open, onClose, width, height, maxHeight, dismissOnDim = true, children }: {
   open: boolean
   onClose: () => void
   /** A click outside the card closes it (transient pickers, not forms). */
