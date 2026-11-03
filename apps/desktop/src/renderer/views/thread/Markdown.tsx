@@ -1,6 +1,6 @@
-import { memo, type ReactNode } from 'react'
+import { memo, useEffect, useState, type ReactNode } from 'react'
 import { parseMarkdown, type Block } from './markdown-blocks.ts'
-import { Hairline } from '../../components/Controls'
+import { Hairline, IconButton } from '../../components/Controls'
 import { HStack, VStack } from '../../components/Stack'
 import { Text } from '../../components/Text'
 import './markdown.css'
@@ -76,28 +76,56 @@ const MarkdownBlock = memo(function MarkdownBlock({ block }: { block: Block }) {
       const cols = Array.from({ length: columns }, (_, i) => i)
       return (
         <div className="md-table-scroll">
-          <div className="md-table md-body" style={{ gridTemplateColumns: `repeat(${columns}, max-content)` }}>
-            {cols.map((i) => (
-              <Text key={`h${i}`} weight="semibold">{inline(block.header[i] ?? '', `h${i}`)}</Text>
-            ))}
-            {block.rows.map((row, r) => [
-              <Hairline key={`l${r}`} style={{ gridColumn: `1 / span ${columns}` }} />,
-              ...cols.map((i) => <span key={`${r}-${i}`}>{inline(row[i] ?? '', `${r}-${i}`)}</span>),
-            ])}
-          </div>
+          <table className="md-table md-body">
+            <thead>
+              <tr>
+                {cols.map((i) => (
+                  <th key={i}><Text weight="semibold">{inline(block.header[i] ?? '', `h${i}`)}</Text></th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, r) => (
+                <tr key={r}>
+                  {cols.map((i) => <td key={i}>{inline(row[i] ?? '', `${r}-${i}`)}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )
     }
     case 'quote':
       return <div className="md-text md-spaced md-body md-quote">{inline(block.text)}</div>
     case 'code':
-      return (
-        <div className="md-code">
-          <pre className="md-code-text">{block.text}</pre>
-        </div>
-      )
+      return <CodeBlock text={block.text} language={block.language} />
   }
 }, (a, b) => JSON.stringify(a.block) === JSON.stringify(b.block))
+
+/** Fenced code: its language and a copy button above it. */
+function CodeBlock({ text, language }: { text: string; language: string }) {
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (!copied) return
+    const t = setTimeout(() => setCopied(false), 1500)
+    return () => clearTimeout(t)
+  }, [copied])
+  const copy = () => {
+    window.codync.app.copy(text)
+    setCopied(true)
+  }
+  return (
+    <div className="md-code">
+      <HStack justify="space-between" align="center" className="md-code-bar">
+        <Text size="caption" tone="secondary" className="md-code-language">{language.trim().split(/\s/)[0] ?? ''}</Text>
+        <IconButton title="Copy" icon={copied ? 'checkmark' : 'square.on.square'} size={22} onClick={copy} />
+      </HStack>
+      <div className="md-code-scroll">
+        <pre className="md-code-text">{text}</pre>
+      </div>
+    </div>
+  )
+}
 
 /** The desktop's Markdown for messages; a block that didn't change keeps its rendering. */
 export const MarkdownText = memo(function MarkdownText({ text }: { text: string }) {

@@ -14,7 +14,10 @@ use tokio::sync::oneshot;
 /// How to talk to the user: part of every bot's instructions (`context`), and the `chat` server's.
 pub const INSTRUCTIONS: &str = "In your chat with the user, the user sees only what you send with send_message; \
 text you write as your reply never reaches them. Send a message whenever you have something worth telling them: \
-short and plain, one thought per message, in the user's language. Lead with the result, then what needs the user. \
+short, one thought per message, in the user's language. Lead with the result, then what needs the user. \
+Messages render Markdown, so format instead of laying text out by hand: a table (header row plus |---| line) for items compared \
+on several fields, a fenced code block with its language for code, commands, logs and config (it gets a copy button), \
+a numbered list for steps, **bold** for the one fact that matters. Never align columns with spaces. \
 Use send_file(path, name?) to share a generated regular file (any type, up to 100 MiB); a local path in text is not a download. Don't send just to acknowledge, to say you started or are still working, or to repeat yourself. \
 For something the user will read as a whole or come back to (a report, plan, comparison, tracker or dashboard), make an Artifact \
 instead of a long message: write one self-contained HTML file (inline CSS and JS; it may load libraries from a CDN) and \
