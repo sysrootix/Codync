@@ -1776,5 +1776,18 @@
   "Message from {bot}: {message}": "Сообщение от {bot}: {message}",
   "Could not start routine: {error}": "Не удалось запустить рутину: {error}",
   "Could not queue routine: {error}": "Не удалось поставить рутину в очередь: {error}",
-  "Routine · {routine}": "Рутина · {routine}"
+  "Routine · {routine}": "Рутина · {routine}",
+  "the Codync cloud refused ({status} {code}): {message}": "облако Codync отказало ({status} {code}): {message}",
+  "Open in a window": "Открыть в окне",
+  "Show": "Показать",
+  "Take control": "Управлять",
+  "View": "Просмотр",
+  "{name} screen": "Экран {name}",
+  "Send my clipboard": "Отправить мой буфер обмена",
+  "Copy from computer": "Скопировать с компьютера",
+  "Hand back to bots": "Вернуть ботам",
+  "Take over": "Взять управление",
+  "Couldn't connect to the remote screen. Check the computer's connection and try again.": "Не удалось подключиться к удалённому экрану. Проверьте подключение компьютера и попробуйте снова.",
+  "Couldn't reconnect to the remote screen.": "Не удалось переподключиться к удалённому экрану.",
+  "Couldn't reach the computer.": "Не удалось связаться с компьютером."
 }

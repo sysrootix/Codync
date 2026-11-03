@@ -1776,5 +1776,18 @@
   "Message from {bot}: {message}": "Mensagem de {bot}: {message}",
   "Could not start routine: {error}": "Não foi possível iniciar a rotina: {error}",
   "Could not queue routine: {error}": "Não foi possível enfileirar a rotina: {error}",
-  "Routine · {routine}": "Rotina · {routine}"
+  "Routine · {routine}": "Rotina · {routine}",
+  "the Codync cloud refused ({status} {code}): {message}": "a nuvem do Codync recusou ({status} {code}): {message}",
+  "Open in a window": "Abrir em uma janela",
+  "Show": "Mostrar",
+  "Take control": "Assumir o controle",
+  "View": "Ver",
+  "{name} screen": "Tela de {name}",
+  "Send my clipboard": "Enviar minha área de transferência",
+  "Copy from computer": "Copiar do computador",
+  "Hand back to bots": "Devolver aos bots",
+  "Take over": "Assumir",
+  "Couldn't connect to the remote screen. Check the computer's connection and try again.": "Não foi possível conectar à tela remota. Verifique a conexão do computador e tente novamente.",
+  "Couldn't reconnect to the remote screen.": "Não foi possível reconectar à tela remota.",
+  "Couldn't reach the computer.": "Não foi possível acessar o computador."
 }
