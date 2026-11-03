@@ -304,6 +304,8 @@ export interface EntryData {
   runId?: string
   /** notice: a failed routine run the user can run again (`retryRoutineRun`). */
   retry?: boolean
+  /** notice: a routine run's start line whose run had nothing to report; hidden. */
+  quiet?: boolean
   text?: string
   final?: boolean
   /** user: queued | sent | cancelled | failed · tool: pending | in_progress | completed | failed · permission: pending | answered | cancelled | expired */
@@ -366,8 +368,8 @@ export function isChat(e: Entry): boolean {
       return true
     case 'notice':
       // Only a fresh conversation gets a line: memory lives in the bot's memory settings, a summary keeps the same
-      // conversation going, and a kept handoff changed nothing.
-      return !e.data.memory && !e.data.memoryFile && !e.data.compaction && e.data.handoff?.status !== 'kept'
+      // conversation going, a kept handoff changed nothing, and a quiet routine run had nothing to say.
+      return !e.data.quiet && !e.data.memory && !e.data.memoryFile && !e.data.compaction && e.data.handoff?.status !== 'kept'
     case 'agent':
       return e.data.final === true
     default:

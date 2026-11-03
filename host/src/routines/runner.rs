@@ -114,9 +114,10 @@ impl Routines {
         let failed = matches!(status, Status::Failed | Status::Interrupted);
         // A run that hit its time limit could hold the bot that long again.
         let safe = failed && !timed_out && !retry::acted(hub, id);
-        let (bot, withdrawn) = self.change(&hub.store, |s| {
+        let (bot, withdrawn, quiet) = self.change(&hub.store, |s| {
             let i = s.runs.iter().position(|r| r.id == id).context("routine run not found")?;
             let mut withdrawn = Vec::new();
+            let mut quiet = false;
             let r = &mut s.runs[i];
             if r.status.active() {
                 let now = now_ms();
@@ -125,6 +126,7 @@ impl Routines {
                 r.detail = detail;
                 r.result = text.filter(|t| !crate::chat::group::is_pass(t));
                 r.report_pending = r.result.is_some() || failed;
+                quiet = status == Status::Succeeded && r.result.is_none();
                 if failed {
                     withdrawn = retry::after_failure(s, i, safe, now);
                 }
@@ -132,9 +134,12 @@ impl Routines {
                     s.runs[i].event = Value::Null;
                 }
             }
-            Ok((s.runs[i].bot_id.clone(), withdrawn))
+            Ok((s.runs[i].bot_id.clone(), withdrawn, quiet))
         })?;
         retry::withdraw(hub, &withdrawn);
+        if quiet {
+            hush(hub, id);
+        }
         self.release(&bot);
         Ok(())
     }
@@ -327,9 +332,61 @@ fn tick(hub: &Arc<Hub>) -> Result<()> {
     Ok(())
 }
 
+/// A run that had nothing to report leaves no line in the chat. Its start notice stays, since it holds
+/// the run's turn, but is marked `quiet` so clients hide it.
+fn hush(hub: &Hub, run_id: &str) {
+    let id = super::notice_id(run_id);
+    if let Some(mut e) = hub.store.entry(&id) {
+        e.data["quiet"] = true.into();
+        hub.set_entry(&id, &e.data);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_silent_run_hides_its_notice_and_a_reply_keeps_it() {
+        let dir = std::env::temp_dir().join(format!("codync-routine-quiet-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let store = Store::open(&dir.join("t.db")).unwrap();
+        let identity = crate::remote::identity::Identity::load_or_create(&dir).unwrap();
+        let hub = Hub::new(store, "test".into(), identity, "token".into(), 0);
+        let routine = super::super::tests::routine();
+        let runs: Vec<Run> = (0..3).map(|_| new_run(&routine, Value::Null, None)).collect();
+        hub.routines
+            .change(&hub.store, |s| {
+                s.routines.push(routine.clone());
+                for r in &runs {
+                    let mut r = r.clone();
+                    r.status = Status::Running;
+                    s.runs.push(r);
+                }
+                Ok(())
+            })
+            .unwrap();
+        for r in &runs {
+            hub.add_entry_once(
+                &super::super::notice_id(&r.id),
+                &Lane::main("bot"),
+                EntryKind::Notice,
+                1,
+                &json!({"text": "Routine · Check", "routineId": routine.id, "runId": r.id}),
+            )
+            .unwrap();
+        }
+        let quiet = |run: &Run| hub.store.entry(&super::super::notice_id(&run.id)).unwrap().data["quiet"] == true;
+        hub.routines.complete(&hub, &runs[0].id, Status::Succeeded, None, Some("(pass)".into()), false).unwrap();
+        hub.routines
+            .complete(&hub, &runs[1].id, Status::Succeeded, None, Some("Two new letters".into()), false)
+            .unwrap();
+        hub.routines.complete(&hub, &runs[2].id, Status::Failed, Some("boom".into()), None, false).unwrap();
+        assert!(quiet(&runs[0]), "nothing to report: the notice is hidden");
+        assert!(!quiet(&runs[1]), "a reply keeps the notice");
+        assert!(!quiet(&runs[2]), "a failure keeps the notice");
+        let _ = std::fs::remove_dir_all(dir);
+    }
 
     #[test]
     fn busy_run_keeps_one_pending_wake_and_interval_cadence() {
