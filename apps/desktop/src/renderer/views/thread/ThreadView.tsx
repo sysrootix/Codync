@@ -10,7 +10,9 @@ import { prefs, usePref } from '../../lib/prefs'
 import { connectedThrough } from '../../lib/relay-copy'
 import { useTr } from '../../lib/use-language'
 import { useScreenViewed } from '../../store/analytics'
-import { useStore } from '../../store/context'
+import { useApp, useStore } from '../../store/context'
+import { offersRemoteScreen } from '../screen/screen-access'
+import { openRemoteScreen } from '../screen/open-remote-screen'
 import { UpdateNeededCard } from '../UpdateNeededCard'
 import { buildChat, rowIn, useArrivals, type ChatItem } from './chat-items'
 import { BotConversationView, BotMessageRow } from './BotConversation'
@@ -44,6 +46,7 @@ const WIDE = 740
  */
 export const ThreadView = memo(function ThreadView({ botId }: { botId: string }) {
   const store = useStore()
+  const app = useApp()
   const bot = store.bots.get(botId) ?? null
   const [showTrace, setShowTrace] = useState(false)
   const [replyTo, setReplyTo] = useState<Entry | null>(null)
@@ -136,6 +139,7 @@ export const ThreadView = memo(function ThreadView({ botId }: { botId: string })
   const presentAgent = useCallback((id: string) => (id === botId ? presentRoutine(null) : setEditingMember(id)), [botId, presentRoutine])
   const member = editingMember ? store.bots.get(editingMember) : undefined
 
+  const screenTab = offersRemoteScreen(store.screen, store.shownConnection.kind === 'online' && !store.mismatch, store === app.local)
   const details = (
     <DetailsPanel
       key={routineRequest}
@@ -143,6 +147,7 @@ export const ThreadView = memo(function ThreadView({ botId }: { botId: string })
       routineId={routineId}
       tab={detailsTab}
       setTab={setDetailsTab}
+      screenTab={screenTab}
       editGroup={() => setEditingGroup(true)}
       openArtifact={openArtifact}
       share={() => {
@@ -163,6 +168,9 @@ export const ThreadView = memo(function ThreadView({ botId }: { botId: string })
           <TopFade />
           <div className="top-chrome-row">
             <Spacer />
+            {screenTab ? (
+              <MacChatButton className="ringed" title="Remote screen" icon="display" onClick={() => openRemoteScreen(store)} />
+            ) : null}
             {(!showSettings || !wide) && !compactDetails ? (
               <MacChatButton className="ringed" title="Conversation details" icon="chevron.left.2" direction={[-1, 0]} onClick={toggleDetails} />
             ) : null}
