@@ -1777,7 +1777,6 @@
   "Could not start routine: {error}": "Не удалось запустить рутину: {error}",
   "Could not queue routine: {error}": "Не удалось поставить рутину в очередь: {error}",
   "Routine · {routine}": "Рутина · {routine}",
-  "the Codync cloud refused ({status} {code}): {message}": "облако Codync отказало ({status} {code}): {message}",
   "Open in a window": "Открыть в окне",
   "Show": "Показать",
   "Take control": "Управлять",

@@ -1777,7 +1777,6 @@
   "Could not start routine: {error}": "Não foi possível iniciar a rotina: {error}",
   "Could not queue routine: {error}": "Não foi possível enfileirar a rotina: {error}",
   "Routine · {routine}": "Rotina · {routine}",
-  "the Codync cloud refused ({status} {code}): {message}": "a nuvem do Codync recusou ({status} {code}): {message}",
   "Open in a window": "Abrir em uma janela",
   "Show": "Mostrar",
   "Take control": "Assumir o controle",
