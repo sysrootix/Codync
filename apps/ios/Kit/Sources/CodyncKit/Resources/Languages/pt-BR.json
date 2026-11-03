@@ -1788,5 +1788,8 @@
   "Take over": "Assumir",
   "Couldn't connect to the remote screen. Check the computer's connection and try again.": "Não foi possível conectar à tela remota. Verifique a conexão do computador e tente novamente.",
   "Couldn't reconnect to the remote screen.": "Não foi possível reconectar à tela remota.",
-  "Couldn't reach the computer.": "Não foi possível acessar o computador."
+  "Couldn't reach the computer.": "Não foi possível acessar o computador.",
+  "Queued": "Na fila",
+  "Retrying at {time}": "Nova tentativa às {time}",
+  "Last run {status}": "Última execução: {status}"
 }

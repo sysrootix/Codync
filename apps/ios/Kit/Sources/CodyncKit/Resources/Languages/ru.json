@@ -1788,5 +1788,8 @@
   "Take over": "Взять управление",
   "Couldn't connect to the remote screen. Check the computer's connection and try again.": "Не удалось подключиться к удалённому экрану. Проверьте подключение компьютера и попробуйте снова.",
   "Couldn't reconnect to the remote screen.": "Не удалось переподключиться к удалённому экрану.",
-  "Couldn't reach the computer.": "Не удалось связаться с компьютером."
+  "Couldn't reach the computer.": "Не удалось связаться с компьютером.",
+  "Queued": "В очереди",
+  "Retrying at {time}": "Повтор в {time}",
+  "Last run {status}": "Последний запуск: {status}"
 }
