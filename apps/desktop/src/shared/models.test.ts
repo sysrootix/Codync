@@ -37,6 +37,8 @@ test('memory lines and summaries stay out of the chat', () => {
   assert.equal(isChat(notice({ text: 'Updated people.md', memoryFile: { status: 'done' } })), false)
   assert.equal(isChat(notice({ text: 'Earlier context was summarized to make room.', compaction: { byHost: true } })), false)
   assert.equal(isChat(notice({ text: 'Stopped.' })), true)
+  assert.equal(isChat(notice({ text: 'Routine · Check mail', routineId: 'r', runId: 'x', quiet: true })), false)
+  assert.equal(isChat(notice({ text: 'Routine · Check mail', routineId: 'r', runId: 'y' })), true)
 })
 
 test('a kept handoff leaves no line; a fresh conversation does', () => {
