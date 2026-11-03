@@ -190,3 +190,13 @@ test('Russian resolves regional tags and keeps its native menu name', () => {
   assert.equal(languageTitle('ru', 'en', 'en'), 'Русский')
   assert.equal(resolvedLanguage('ru', 'pt-BR'), 'ru')
 })
+
+test('bot, routine and message slots keep what the user wrote; other slots still translate', () => {
+  // "connected", "Reviewer" and "Settings" are catalog phrases, but as a name or a message they stay as written.
+  assert.equal(translate('Created bot connected', 'ru', false), 'Создан бот connected')
+  assert.equal(translate('Created bot Reviewer', 'ru', false), 'Создан бот Reviewer')
+  assert.equal(translate('Routine · Проверка почты', 'ru', false), 'Рутина · Проверка почты')
+  assert.equal(translate('Routine · Settings', 'ru', false), 'Рутина · Settings')
+  assert.equal(translate('Message from Reviewer: Settings', 'ru', false), 'Сообщение от Reviewer: Settings')
+  assert.equal(translate('Runs the official installer on this Mac.', 'ru', false), 'Запускает официальный установщик на этот Mac.')
+})

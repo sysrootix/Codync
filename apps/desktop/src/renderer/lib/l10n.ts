@@ -69,7 +69,7 @@ interface Piece { literal?: string; token?: string }
  * A filled sentence ("Runs the official installer on this Mac.") matches the key,
  * and a slot that is itself a known phrase (a setup hint) is translated too.
  */
-const templates: Array<{ key: string; pieces: Piece[]; literal: number }> = Object.keys(hans).flatMap((key) => {
+const templates: Array<{ key: string; pieces: Piece[]; literal: number }> = [...new Set(Object.values(catalogs).flatMap((catalog) => Object.keys(catalog)))].flatMap((key) => {
   const pieces = parseTemplate(key)
   if (!pieces) return []
   const literal = pieces.reduce((n, piece) => n + (piece.literal?.length ?? 0), 0)
@@ -98,6 +98,9 @@ function hit(key: string, primary: Record<string, string>, fallback: Record<stri
   return primary[key] ?? fallback[key]
 }
 
+/** Slots that hold what a person wrote (a bot or routine name, a message): inserted as written, never translated. */
+const VERBATIM = new Set(['{bot}', '{routine}', '{message}'])
+
 function fill(text: string, pieces: Piece[], phrase: string, primary: Record<string, string>, fallback: Record<string, string>, depth: number): string | undefined {
   let pos = 0
   const caps = new Map<string, string>()
@@ -118,7 +121,7 @@ function fill(text: string, pieces: Piece[], phrase: string, primary: Record<str
   if (pos !== text.length) return undefined
   let result = phrase
   for (const [token, value] of caps) {
-    const inner = hit(value, primary, fallback) ?? (depth === 0 ? templated(value, primary, fallback, 1) : undefined) ?? value
+    const inner = VERBATIM.has(token) ? value : hit(value, primary, fallback) ?? (depth === 0 ? templated(value, primary, fallback, 1) : undefined) ?? value
     result = result.replaceAll(token, inner)
   }
   return result
@@ -148,6 +151,21 @@ export function translate(text: string, preference: AppLanguage, system: string 
   if (direct) return direct
   const trimmed = text.trim()
   return trimmed === text ? text : (phrase(trimmed, primary, fallback) ?? text)
+}
+
+/** The Settings choice without the window: the `appLanguage` pref is stored under this key. */
+function savedLanguage(): AppLanguage {
+  try {
+    const raw = localStorage.getItem('appLanguage')
+    return raw === null ? 'system' : JSON.parse(raw) as AppLanguage
+  } catch {
+    return 'system'
+  }
+}
+
+/** Translates for the language saved in Settings, outside a component (stores, engines, helpers). */
+export function trNow(text: string): string {
+  return translate(text, savedLanguage(), typeof navigator === 'undefined' ? 'en' : navigator.language)
 }
 
 /** "resets 3h 20m" / "resets in 2d 6h". Compact times become "3小时20分后重置". */

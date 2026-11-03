@@ -1,6 +1,7 @@
 import type { UsageProvider, UsageWindow } from '@shared/models'
 import { isDark } from '../../lib/theme'
 
+
 /** Claude keeps its orange; everyone else is ink, like the rest of the app. */
 export function providerTint(id: string) {
   return id === 'claude' ? '#D97757' : isDark() ? '#FFFFFF' : '#000000'
